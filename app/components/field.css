@@ -1,0 +1,24 @@
+.game-scope {
+    display: flex;
+    justify-content: center;
+}
+
+.game-space {
+    width: 200px;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    height: 400px;
+    flex-wrap: wrap;
+}
+
+.game-space:nth-child(2) {
+    align-self: flex-end;
+}
