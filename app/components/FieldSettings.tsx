@@ -1,32 +1,33 @@
 "use client";
 
-import React from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
 import type { Settings } from "../page";
+import { fieldSettingsContext } from "../page";
 
-const Form = styled.form`
+const Container = styled.form`
   display: flex;
   flex-direction: column;
   gap: 10px;
   align-items: flex-start;
 `;
 
-type Props = {
-  fieldSettings: Settings;
-  setFieldSettings: React.Dispatch<React.SetStateAction<Settings>>;
-};
-
-const FieldSettings = ({ fieldSettings, setFieldSettings }: Props) => {
+const FieldSettings = () => {
+  const useSettingsContext = () => useContext(fieldSettingsContext);
+  const { fieldSettings, setFieldSettings } = useSettingsContext();
   return (
-    <Form>
+    <Container>
       <label htmlFor="line">Enter number of lines</label>
       <input
         id="line"
         type="text"
         placeholder="Number"
-        value={fieldSettings.line}
+        value={fieldSettings.linesCount}
         onChange={(e) =>
-          setFieldSettings({ ...fieldSettings, line: +e.target.value })
+          setFieldSettings((prev: Settings) => ({
+            ...prev,
+            linesCount: +e.target.value,
+          }))
         }
       />
       <label htmlFor="column">Enter number of columns</label>
@@ -34,9 +35,12 @@ const FieldSettings = ({ fieldSettings, setFieldSettings }: Props) => {
         id="column"
         type="text"
         placeholder="Number"
-        value={fieldSettings.column}
+        value={fieldSettings.columnsCount}
         onChange={(e) =>
-          setFieldSettings({ ...fieldSettings, column: +e.target.value })
+          setFieldSettings((prev: Settings) => ({
+            ...prev,
+            columnsCount: +e.target.value,
+          }))
         }
       />
 
@@ -47,10 +51,13 @@ const FieldSettings = ({ fieldSettings, setFieldSettings }: Props) => {
         placeholder="Number"
         value={fieldSettings.cellWidth}
         onChange={(e) =>
-          setFieldSettings({ ...fieldSettings, cellWidth: +e.target.value })
+          setFieldSettings((prev: Settings) => ({
+            ...prev,
+            cellWidth: +e.target.value,
+          }))
         }
       />
-    </Form>
+    </Container>
   );
 };
 export default FieldSettings;

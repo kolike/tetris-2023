@@ -1,43 +1,44 @@
 "use client";
 
 import Cell from "./Сell";
-import React from "react";
+import React, { useContext } from "react";
 import styled from "styled-components";
-import type { Settings } from "../page";
+import { fieldSettingsContext } from "../page";
 
-const Container = styled.div`
-  display: flex;
-  justify-content: center;
-`;
-
-const FieldSpace = styled.div<{ $fieldSettings: Props }>`
+const FieldSpace = styled.div<{
+  $height: number;
+  $width: number;
+  $cellWidth: number;
+}>`
   display: flex;
   flex-direction: column;
   align-content: center;
   justify-content: flex-start;
-  height: ${(props) =>
-    props.$fieldSettings.cellWidth * props.$fieldSettings.line}px;
-  width: ${(props) =>
-    props.$fieldSettings.cellWidth * props.$fieldSettings.column}px;
+  height: ${(props) => props.$cellWidth * props.$height}px;
+  width: ${(props) => props.$cellWidth * props.$width}px;
   flex-wrap: wrap;
 `;
 
-type Props = {
-  fieldSettings: Settings;
-};
-
-const Field = ({ fieldSettings }: Props) => {
+const Field = () => {
+  const useSettingsContext = () => useContext(fieldSettingsContext);
+  const { fieldSettings } = useSettingsContext();
   const fieldArr = [];
 
-  for (let i = 0; i < fieldSettings.line * fieldSettings.column; i++) {
-    fieldArr.push(<Cell key={i} fieldSettings={fieldSettings} />);
+  for (
+    let i = 0;
+    i < fieldSettings.linesCount * fieldSettings.columnsCount;
+    i++
+  ) {
+    fieldArr.push(<Cell key={i} cellWidth={fieldSettings.cellWidth} />);
   }
-  console.log(fieldSettings.cellWidth * fieldSettings.line);
 
   return (
-    <Container>
-      <FieldSpace $fieldSettings={fieldSettings}>{fieldArr}</FieldSpace>
-    </Container>
+    <FieldSpace
+      $height={fieldSettings.linesCount}
+      $width={fieldSettings.columnsCount}
+      $cellWidth={fieldSettings.cellWidth}>
+      {fieldArr}
+    </FieldSpace>
   );
 };
 export default Field;
