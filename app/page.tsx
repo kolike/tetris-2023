@@ -18,19 +18,10 @@ export type Settings = {
 };
 
 export default function Home() {
-  const [fieldSettings, setFieldSettings] = useState<Settings>({
-    cellSize: 20,
-    linesCount: 20,
-    columnsCount: 10,
-  });
-
   return (
     <Container>
-      <fieldSettingsContext.Provider
-        value={{ fieldSettings, setFieldSettings }}>
-        <FieldSettings />
-        <Field />
-      </fieldSettingsContext.Provider>
+      <FieldSettings />
+      <Field />
     </Container>
   );
 }
