@@ -2,8 +2,7 @@
 
 import React, { useContext } from "react";
 import styled from "styled-components";
-import type { Settings } from "../page";
-import { fieldSettingsContext } from "../page";
+import { UseSettings } from "./FieldSettingsContext";
 
 const Container = styled.form`
   display: flex;
@@ -13,8 +12,7 @@ const Container = styled.form`
 `;
 
 const FieldSettings = () => {
-  const useSettingsContext = () => useContext(fieldSettingsContext);
-  const { fieldSettings, setFieldSettings } = useSettingsContext();
+  const { fieldSettings, setFieldSettings } = UseSettings();
   return (
     <Container>
       <label htmlFor="line">Enter number of lines</label>
@@ -24,7 +22,7 @@ const FieldSettings = () => {
         placeholder="Number"
         value={fieldSettings.linesCount}
         onChange={(e) =>
-          setFieldSettings((prev: Settings) => ({
+          setFieldSettings((prev) => ({
             ...prev,
             linesCount: +e.target.value,
           }))
@@ -37,23 +35,23 @@ const FieldSettings = () => {
         placeholder="Number"
         value={fieldSettings.columnsCount}
         onChange={(e) =>
-          setFieldSettings((prev: Settings) => ({
+          setFieldSettings((prev) => ({
             ...prev,
             columnsCount: +e.target.value,
           }))
         }
       />
 
-      <label htmlFor="cellWidth">Enter cell width</label>
+      <label htmlFor="cellSize">Enter cell width</label>
       <input
-        id="cellWidth"
+        id="cellSize"
         type="text"
         placeholder="Number"
-        value={fieldSettings.cellWidth}
+        value={fieldSettings.cellSize}
         onChange={(e) =>
-          setFieldSettings((prev: Settings) => ({
+          setFieldSettings((prev) => ({
             ...prev,
-            cellWidth: +e.target.value,
+            cellSize: +e.target.value,
           }))
         }
       />

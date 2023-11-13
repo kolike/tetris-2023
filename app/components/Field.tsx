@@ -1,42 +1,41 @@
 "use client";
 
 import Cell from "./Сell";
-import React, { useContext } from "react";
+import React from "react";
 import styled from "styled-components";
-import { fieldSettingsContext } from "../page";
+import { UseSettings } from "./FieldSettingsContext";
 
 const FieldSpace = styled.div<{
   $height: number;
   $width: number;
-  $cellWidth: number;
 }>`
   display: flex;
   flex-direction: column;
   align-content: center;
   justify-content: flex-start;
-  height: ${(props) => props.$cellWidth * props.$height}px;
-  width: ${(props) => props.$cellWidth * props.$width}px;
+  height: ${(props) => props.$height}px;
+  width: ${(props) => props.$width}px;
   flex-wrap: wrap;
 `;
 
 const Field = () => {
-  const useSettingsContext = () => useContext(fieldSettingsContext);
-  const { fieldSettings } = useSettingsContext();
+  const { fieldSettings } = UseSettings();
+  const { cellSize, linesCount, columnsCount } = fieldSettings;
+
+  const getFieldSize = (size: number) => {
+    return cellSize * size;
+  };
+
   const fieldArr = [];
 
-  for (
-    let i = 0;
-    i < fieldSettings.linesCount * fieldSettings.columnsCount;
-    i++
-  ) {
-    fieldArr.push(<Cell key={i} cellWidth={fieldSettings.cellWidth} />);
+  for (let i = 0; i < linesCount * columnsCount; i++) {
+    fieldArr.push(<Cell key={i} size={cellSize} />);
   }
 
   return (
     <FieldSpace
-      $height={fieldSettings.linesCount}
-      $width={fieldSettings.columnsCount}
-      $cellWidth={fieldSettings.cellWidth}>
+      $height={getFieldSize(linesCount)}
+      $width={getFieldSize(columnsCount)}>
       {fieldArr}
     </FieldSpace>
   );
