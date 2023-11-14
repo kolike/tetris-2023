@@ -9,13 +9,13 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: JSX.Element | JSX.Element[];
 }) {
   return (
-    <FieldSettingsProvider>
-      <html lang="en">
-        <body>{children}</body>
-      </html>
-    </FieldSettingsProvider>
+    <html lang="en">
+      <body>
+        <FieldSettingsProvider>{children}</FieldSettingsProvider>
+      </body>
+    </html>
   );
 }

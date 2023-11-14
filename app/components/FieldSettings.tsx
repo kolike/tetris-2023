@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useContext } from "react";
+import React from "react";
 import styled from "styled-components";
-import { useSettings } from "./hooks/useSettings";
+import { useSettings } from "./providers/FieldSettingsProvider";
 
 const Container = styled.form`
   display: flex;

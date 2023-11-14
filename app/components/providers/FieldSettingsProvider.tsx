@@ -1,7 +1,7 @@
 "use client";
 import { Dispatch, SetStateAction, createContext, useState } from "react";
 
-interface props {
+export interface Props {
   children: JSX.Element | JSX.Element[];
 }
 
@@ -16,7 +16,7 @@ interface SettingsContext {
   setFieldSettings: Dispatch<SetStateAction<Settings>>;
 }
 
-export const fieldSettingsContext = createContext<SettingsContext>({
+const fieldSettingsContext = createContext<SettingsContext>({
   fieldSettings: {
     cellSize: 0,
     linesCount: 0,
@@ -25,7 +25,7 @@ export const fieldSettingsContext = createContext<SettingsContext>({
   setFieldSettings: () => {},
 });
 
-export const FieldSettingsProvider = ({ children }: props) => {
+export const FieldSettingsProvider = ({ children }: Props) => {
   const [fieldSettings, setFieldSettings] = useState<Settings>({
     cellSize: 20,
     linesCount: 20,
@@ -37,4 +37,10 @@ export const FieldSettingsProvider = ({ children }: props) => {
       {children}
     </fieldSettingsContext.Provider>
   );
+};
+
+import { useContext } from "react";
+
+export const useSettings = () => {
+  return useContext(fieldSettingsContext);
 };

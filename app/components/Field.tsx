@@ -3,7 +3,7 @@
 import Cell from "./Сell";
 import React from "react";
 import styled from "styled-components";
-import { useSettings } from "./hooks/useSettings";
+import { useSettings } from "./providers/FieldSettingsProvider";
 
 const FieldSpace = styled.div<{
   $height: number;
