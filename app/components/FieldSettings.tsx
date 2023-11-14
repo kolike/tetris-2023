@@ -2,7 +2,7 @@
 
 import React, { useContext } from "react";
 import styled from "styled-components";
-import { UseSettings } from "./FieldSettingsContext";
+import { useSettings } from "./hooks/useSettings";
 
 const Container = styled.form`
   display: flex;
@@ -12,7 +12,7 @@ const Container = styled.form`
 `;
 
 const FieldSettings = () => {
-  const { fieldSettings, setFieldSettings } = UseSettings();
+  const { fieldSettings, setFieldSettings } = useSettings();
   return (
     <Container>
       <label htmlFor="line">Enter number of lines</label>
