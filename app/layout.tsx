@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { FieldSettingsProvider } from "./components/providers/FieldSettingsProvider";
 
 export const metadata: Metadata = {
   title: "Tetris-2023",
@@ -11,8 +12,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
+    <FieldSettingsProvider>
+      <html lang="en">
+        <body>{children}</body>
+      </html>
+    </FieldSettingsProvider>
   );
 }
