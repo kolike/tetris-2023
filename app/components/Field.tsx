@@ -3,7 +3,7 @@
 import Cell from "./Сell";
 import React from "react";
 import styled from "styled-components";
-import { useSettings } from "./providers/FieldSettingsProvider";
+import { useFieldSettings } from "../providers/FieldSettingsProvider";
 
 const FieldSpace = styled.div<{
   $height: number;
@@ -19,12 +19,8 @@ const FieldSpace = styled.div<{
 `;
 
 const Field = () => {
-  const { fieldSettings } = useSettings();
+  const { fieldSettings } = useFieldSettings();
   const { cellSize, linesCount, columnsCount } = fieldSettings;
-
-  const getFieldSize = (size: number) => {
-    return cellSize * size;
-  };
 
   const fieldArr = [];
 
@@ -34,10 +30,11 @@ const Field = () => {
 
   return (
     <FieldSpace
-      $height={getFieldSize(linesCount)}
-      $width={getFieldSize(columnsCount)}>
+      $height={cellSize * linesCount}
+      $width={cellSize * columnsCount}>
       {fieldArr}
     </FieldSpace>
   );
 };
+
 export default Field;

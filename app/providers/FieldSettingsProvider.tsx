@@ -1,8 +1,14 @@
 "use client";
-import { Dispatch, SetStateAction, createContext, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  createContext,
+  useState,
+  useContext,
+} from "react";
 
-export interface Props {
-  children: JSX.Element | JSX.Element[];
+interface Props {
+  children: React.ReactNode;
 }
 
 type Settings = {
@@ -39,8 +45,6 @@ export const FieldSettingsProvider = ({ children }: Props) => {
   );
 };
 
-import { useContext } from "react";
-
-export const useSettings = () => {
+export const useFieldSettings = () => {
   return useContext(fieldSettingsContext);
 };

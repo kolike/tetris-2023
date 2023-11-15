@@ -28,4 +28,5 @@ const Cell = ({ size }: Props) => {
       onClick={setActiveCell}></FieldCell>
   );
 };
+
 export default Cell;

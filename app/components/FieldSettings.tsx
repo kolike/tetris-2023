@@ -2,7 +2,7 @@
 
 import React from "react";
 import styled from "styled-components";
-import { useSettings } from "./providers/FieldSettingsProvider";
+import { useFieldSettings } from "../providers/FieldSettingsProvider";
 
 const Container = styled.form`
   display: flex;
@@ -12,7 +12,7 @@ const Container = styled.form`
 `;
 
 const FieldSettings = () => {
-  const { fieldSettings, setFieldSettings } = useSettings();
+  const { fieldSettings, setFieldSettings } = useFieldSettings();
   return (
     <Container>
       <label htmlFor="line">Enter number of lines</label>
@@ -41,8 +41,7 @@ const FieldSettings = () => {
           }))
         }
       />
-
-      <label htmlFor="cellSize">Enter cell width</label>
+      <label htmlFor="cellSize">Enter cell size</label>
       <input
         id="cellSize"
         type="text"
@@ -58,4 +57,5 @@ const FieldSettings = () => {
     </Container>
   );
 };
+
 export default FieldSettings;
