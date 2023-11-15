@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { FieldSettingsProvider } from "./providers/FieldSettingsProvider";
 
 export const metadata: Metadata = {
   title: "Tetris-2023",
@@ -12,7 +13,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <FieldSettingsProvider>{children}</FieldSettingsProvider>
+      </body>
     </html>
   );
 }
