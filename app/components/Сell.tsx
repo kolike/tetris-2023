@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 
 const FieldCell = styled.div<{ $isActive?: boolean; $size: number }>`
@@ -16,17 +16,7 @@ type Props = {
 };
 
 const Cell = ({ size }: Props) => {
-  const [isActive, setIsActive] = useState(false);
-  const setActiveCell = () => {
-    setIsActive((prev) => !prev);
-  };
-
-  return (
-    <FieldCell
-      $isActive={isActive}
-      $size={size}
-      onClick={setActiveCell}></FieldCell>
-  );
+  return <FieldCell $size={size}></FieldCell>;
 };
 
 export default Cell;
