@@ -13,10 +13,11 @@ const FieldCell = styled.div<{ $isActive?: boolean; $size: number }>`
 
 type Props = {
   size: number;
+  active: boolean;
 };
 
-const Cell = ({ size }: Props) => {
-  return <FieldCell $size={size}></FieldCell>;
+const Cell = ({ size, active }: Props) => {
+  return <FieldCell $isActive={active} $size={size}></FieldCell>;
 };
 
 export default Cell;

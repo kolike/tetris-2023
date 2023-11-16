@@ -34,8 +34,8 @@ const fieldSettingsContext = createContext<SettingsContext>({
 export const FieldSettingsProvider = ({ children }: Props) => {
   const [fieldSettings, setFieldSettings] = useState<Settings>({
     cellSize: 20,
-    linesCount: 1,
-    columnsCount: 2,
+    linesCount: 20,
+    columnsCount: 10,
   });
 
   return (
