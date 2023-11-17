@@ -18,53 +18,47 @@ const FieldSpace = styled.div<{
   flex-wrap: wrap;
 `;
 
+type cell = { active: boolean }[];
+
 const Field = () => {
   const { fieldSettings } = useFieldSettings();
   const { cellSize, linesCount, columnsCount } = fieldSettings;
-  const [isActive, setIsActive] = useState<any[]>([]);
-  const cellCount = linesCount * columnsCount;
-
-  const fieldArr: any[] = [];
-
-  for (let i = 0; i < linesCount * columnsCount; i++) {
-    if (i === 0) {
-      fieldArr.push({
-        id: i,
-        size: cellSize,
-        active: true,
-      });
-    } else {
-      fieldArr.push({
-        id: i,
-        size: cellSize,
-        active: false,
-      });
-    }
-  }
+  const [cellsState, setСellsState] = useState<cell>([]);
 
   useEffect(() => {
-    setIsActive([...fieldArr]);
+    const fieldArr: cell = [];
+
+    for (let i = 0; i < linesCount * columnsCount; i++) {
+      if (i === 0) {
+        fieldArr.push({
+          active: true,
+        });
+      } else {
+        fieldArr.push({
+          active: false,
+        });
+      }
+    }
+    setСellsState([...fieldArr]);
   }, []);
 
-  const elements = isActive.map((item, i) => {
-    const { size, active } = item;
-    return <Cell key={i} size={size} active={active} />;
-  });
-
-  console.log("isactve", isActive);
-
   useEffect(() => {
-    const onKeydown = (e: any) => {
-      let copy = [...isActive];
-      let activeCellId = copy.find((obj) => obj.active === true).id;
+    const onKeydown = (e: KeyboardEvent) => {
+      let copy = [...cellsState];
+      let activeCellId = copy.findIndex((e) => e.active);
       const spareCellId = activeCellId;
       copy[activeCellId].active = false;
+
       switch (e.keyCode) {
         case 40:
-          activeCellId = activeCellId + 1;
+          if ((activeCellId + 1) % linesCount !== 0) {
+            activeCellId = activeCellId + 1;
+          }
           break;
         case 38:
-          activeCellId = activeCellId - 1;
+          if (activeCellId % linesCount !== 0) {
+            activeCellId = activeCellId - 1;
+          }
           break;
         case 37:
           activeCellId = activeCellId - linesCount;
@@ -74,25 +68,29 @@ const Field = () => {
           break;
       }
 
-      if (activeCellId < cellCount && activeCellId >= 0) {
+      if (activeCellId < linesCount * columnsCount && activeCellId >= 0) {
         copy[activeCellId].active = true;
-        setIsActive(copy);
+        setСellsState(copy);
       } else {
         copy[spareCellId].active = true;
-        setIsActive(copy);
+        setСellsState(copy);
       }
     };
     document.addEventListener("keydown", onKeydown);
+
     return () => {
       document.removeEventListener("keydown", onKeydown);
     };
-  }, [isActive]);
+  }, [cellsState]);
 
   return (
     <FieldSpace
       $height={cellSize * linesCount}
       $width={cellSize * columnsCount}>
-      {elements}
+      {cellsState.map((item, i) => {
+        const { active } = item;
+        return <Cell key={i} size={cellSize} isFilled={active} />;
+      })}
     </FieldSpace>
   );
 };
