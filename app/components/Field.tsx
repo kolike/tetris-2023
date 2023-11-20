@@ -18,78 +18,70 @@ const FieldSpace = styled.div<{
   flex-wrap: wrap;
 `;
 
-type cell = { active: boolean }[];
+type CellСoordArr = number[][];
 
 const Field = () => {
   const { fieldSettings } = useFieldSettings();
   const { cellSize, linesCount, columnsCount } = fieldSettings;
-  const [cellsState, setСellsState] = useState<cell>([]);
+  const [cellsState, setСellsState] = useState<CellСoordArr>([]);
+  const [activeCell, setActiveCell] = useState([1, 1]);
 
   useEffect(() => {
-    const fieldArr: cell = [];
-
-    for (let i = 0; i < linesCount * columnsCount; i++) {
-      if (i === 0) {
-        fieldArr.push({
-          active: true,
-        });
-      } else {
-        fieldArr.push({
-          active: false,
-        });
+    const fieldArr: CellСoordArr = [];
+    for (let i = 1; i < columnsCount + 1; i++) {
+      for (let j = 1; j < linesCount + 1; j++) {
+        fieldArr.push([i, j]);
       }
     }
-    setСellsState([...fieldArr]);
-  }, []);
+
+    setСellsState(fieldArr);
+  }, [fieldSettings]);
 
   useEffect(() => {
     const onKeydown = (e: KeyboardEvent) => {
-      let copy = [...cellsState];
-      let activeCellId = copy.findIndex((e) => e.active);
-      const spareCellId = activeCellId;
-      copy[activeCellId].active = false;
-
-      switch (e.keyCode) {
-        case 40:
-          if ((activeCellId + 1) % linesCount !== 0) {
-            activeCellId = activeCellId + 1;
+      switch (e.key) {
+        case "ArrowDown":
+          if (activeCell[1] >= 0 && activeCell[1] < linesCount) {
+            setActiveCell((prev) => [prev[0], prev[1]++]);
           }
           break;
-        case 38:
-          if (activeCellId % linesCount !== 0) {
-            activeCellId = activeCellId - 1;
+        case "ArrowUp":
+          if (activeCell[1] > 1 && activeCell[1] <= linesCount) {
+            setActiveCell((prev) => [prev[0], prev[1]--]);
           }
           break;
-        case 37:
-          activeCellId = activeCellId - linesCount;
+        case "ArrowLeft":
+          if (activeCell[0] > 1 && activeCell[0] <= columnsCount) {
+            setActiveCell((prev) => [prev[0]--, prev[1]]);
+          }
           break;
-        case 39:
-          activeCellId = activeCellId + linesCount;
+        case "ArrowRight":
+          if (activeCell[0] >= 0 && activeCell[0] < columnsCount) {
+            setActiveCell((prev) => [prev[0]++, prev[1]]);
+          }
           break;
-      }
-
-      if (activeCellId < linesCount * columnsCount && activeCellId >= 0) {
-        copy[activeCellId].active = true;
-        setСellsState(copy);
-      } else {
-        copy[spareCellId].active = true;
-        setСellsState(copy);
       }
     };
+
     document.addEventListener("keydown", onKeydown);
 
     return () => {
       document.removeEventListener("keydown", onKeydown);
     };
-  }, [cellsState]);
+  }, [activeCell]);
 
   return (
     <FieldSpace
       $height={cellSize * linesCount}
       $width={cellSize * columnsCount}>
       {cellsState.map((item, i) => {
-        const { active } = item;
-        return <Cell key={i} size={cellSize} isFilled={active} />;
+        return (
+          <Cell
+            key={i}
+            size={cellSize}
+            isFilled={JSON.stringify(item) === JSON.stringify(activeCell)}
+          />
+        );
       })}
     </FieldSpace>
   );
