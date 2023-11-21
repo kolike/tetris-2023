@@ -10,7 +10,7 @@ const FieldSpace = styled.div<{
   $width: number;
 }>`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-content: center;
   justify-content: flex-start;
   height: ${(props) => props.$height}px;
@@ -18,70 +18,71 @@ const FieldSpace = styled.div<{
   flex-wrap: wrap;
 `;
 
-type CellСoordArr = number[][];
+type CellBoolArr = boolean[][];
 
 const Field = () => {
   const { fieldSettings } = useFieldSettings();
   const { cellSize, linesCount, columnsCount } = fieldSettings;
-  const [cellsState, setСellsState] = useState<CellСoordArr>([]);
-  const [activeCell, setActiveCell] = useState([1, 1]);
+  const [cellsState, setСellsState] = useState<CellBoolArr>([]);
+  const [coordX, setCoordX] = useState(1);
+  const [coordY, setCoordY] = useState(1);
 
   useEffect(() => {
-    const fieldArr: CellСoordArr = [];
-    for (let i = 1; i < columnsCount + 1; i++) {
-      for (let j = 1; j < linesCount + 1; j++) {
-        fieldArr.push([i, j]);
+    const fieldArr: CellBoolArr = [];
+    for (let i = 0; i < linesCount; i++) {
+      fieldArr[i] = new Array();
+    }
+    for (let i = 0; i < linesCount; i++) {
+      for (let j = 0; j < columnsCount; j++) {
+        fieldArr[i][j] = false;
       }
     }
-
+    fieldArr[coordX][coordY] = true;
     setСellsState(fieldArr);
   }, [fieldSettings]);
 
   useEffect(() => {
+    const copyArr = [...cellsState];
     const onKeydown = (e: KeyboardEvent) => {
       switch (e.key) {
         case "ArrowDown":
-          if (activeCell[1] >= 0 && activeCell[1] < linesCount) {
-            setActiveCell((prev) => [prev[0], prev[1]++]);
-          }
+          setCoordX((prev) => prev + 1);
+          copyArr[coordX][coordY] = true;
+
           break;
         case "ArrowUp":
-          if (activeCell[1] > 1 && activeCell[1] <= linesCount) {
-            setActiveCell((prev) => [prev[0], prev[1]--]);
-          }
+          setCoordX((prev) => prev - 1);
+          copyArr[coordX][coordY] = true;
+
           break;
         case "ArrowLeft":
-          if (activeCell[0] > 1 && activeCell[0] <= columnsCount) {
-            setActiveCell((prev) => [prev[0]--, prev[1]]);
-          }
+          setCoordY((prev) => prev - 1);
+          copyArr[coordX][coordY] = true;
+
           break;
         case "ArrowRight":
-          if (activeCell[0] >= 0 && activeCell[0] < columnsCount) {
-            setActiveCell((prev) => [prev[0]++, prev[1]]);
-          }
-          break;
+          setCoordY((prev) => prev + 1);
+          copyArr[coordX][coordY] = true;
       }
     };
+    setСellsState(copyArr);
+    console.log(coordX);
 
     document.addEventListener("keydown", onKeydown);
 
     return () => {
       document.removeEventListener("keydown", onKeydown);
     };
-  }, [activeCell]);
+  }, [coordX, coordY]);
 
   return (
     <FieldSpace
       $height={cellSize * linesCount}
       $width={cellSize * columnsCount}>
-      {cellsState.map((item, i) => {
-        return (
-          <Cell
-            key={i}
-            size={cellSize}
-            isFilled={JSON.stringify(item) === JSON.stringify(activeCell)}
-          />
-        );
+      {cellsState.map((item) => {
+        return item.map((newItem, i) => {
+          return <Cell key={i} size={cellSize} isFilled={newItem} />;
+        });
       })}
     </FieldSpace>
   );
