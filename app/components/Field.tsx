@@ -1,7 +1,7 @@
 "use client";
 
 import Cell from "./Сell";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { useFieldSettings } from "../providers/FieldSettingsProvider";
 
@@ -24,10 +24,10 @@ const Field = () => {
   const { fieldSettings } = useFieldSettings();
   const { cellSize, linesCount, columnsCount } = fieldSettings;
   const [cellsState, setСellsState] = useState<CellBoolArr>([]);
-  const [coordX, setCoordX] = useState(1);
-  const [coordY, setCoordY] = useState(1);
+  const [coordX, setCoordX] = useState(0);
+  const [coordY, setCoordY] = useState(0);
 
-  useEffect(() => {
+  const field = useMemo(() => {
     const fieldArr: CellBoolArr = [];
     for (let i = 0; i < linesCount; i++) {
       fieldArr[i] = new Array();
@@ -37,36 +37,39 @@ const Field = () => {
         fieldArr[i][j] = false;
       }
     }
-    fieldArr[coordX][coordY] = true;
-    setСellsState(fieldArr);
-  }, [fieldSettings]);
+
+    return fieldArr;
+  }, [linesCount, columnsCount, coordX, coordY]);
+
+  const onKeydown = (e: KeyboardEvent) => {
+    switch (e.key) {
+      case "ArrowDown":
+        if (coordX >= 0 && coordX < linesCount - 1) {
+          setCoordX((prev) => prev + 1);
+        }
+        break;
+      case "ArrowUp":
+        if (coordX > 0 && coordX <= linesCount) {
+          setCoordX((prev) => prev - 1);
+        }
+        break;
+      case "ArrowLeft":
+        if (coordY > 0 && coordY <= columnsCount) {
+          setCoordY((prev) => prev - 1);
+        }
+        break;
+      case "ArrowRight":
+        if (coordY >= 0 && coordY < columnsCount - 1) {
+          setCoordY((prev) => prev + 1);
+        }
+        break;
+    }
+  };
 
   useEffect(() => {
-    const copyArr = [...cellsState];
-    const onKeydown = (e: KeyboardEvent) => {
-      switch (e.key) {
-        case "ArrowDown":
-          setCoordX((prev) => prev + 1);
-          copyArr[coordX][coordY] = true;
-
-          break;
-        case "ArrowUp":
-          setCoordX((prev) => prev - 1);
-          copyArr[coordX][coordY] = true;
-
-          break;
-        case "ArrowLeft":
-          setCoordY((prev) => prev - 1);
-          copyArr[coordX][coordY] = true;
-
-          break;
-        case "ArrowRight":
-          setCoordY((prev) => prev + 1);
-          copyArr[coordX][coordY] = true;
-      }
-    };
+    const copyArr = [...field];
+    copyArr[coordX][coordY] = true;
     setСellsState(copyArr);
-    console.log(coordX);
 
     document.addEventListener("keydown", onKeydown);
 
