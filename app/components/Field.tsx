@@ -27,11 +27,24 @@ const Field = () => {
 
   useEffect(() => {
     setСellsState(createFild(0, 0));
-  }, [fieldSettings]);
+  }, [linesCount, columnsCount]);
 
   useEffect(() => {
     const onKeydown = (e: KeyboardEvent) => {
-      let [i, j]: any = find();
+      let coord = { i: 0, j: 0 };
+
+      for (let i = 0; i < cellsState.length; i++) {
+        if (cellsState[i].includes(true)) {
+          for (let j = 0; j < cellsState[i].length; j++) {
+            if (cellsState[i][j]) {
+              coord = { i, j };
+            }
+          }
+        }
+      }
+
+      let { i, j } = coord;
+
       switch (e.key) {
         case "ArrowDown":
           if (i >= 0 && i < linesCount - 1) {
@@ -64,7 +77,7 @@ const Field = () => {
     };
   }, [cellsState]);
 
-  function createFild(x: any, y: any) {
+  function createFild(x: number, y: number) {
     const fieldArr: CellBoolArr = [];
 
     for (let i = 0; i < linesCount; i++) {
@@ -79,18 +92,6 @@ const Field = () => {
     fieldArr[x][y] = true;
 
     return fieldArr;
-  }
-
-  function find() {
-    for (let i = 0; i < cellsState.length; i++) {
-      if (cellsState[i].includes(true)) {
-        for (let j = 0; j < cellsState[i].length; j++) {
-          if (cellsState[i][j]) {
-            return [i, j];
-          }
-        }
-      }
-    }
   }
 
   return (
