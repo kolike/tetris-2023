@@ -18,32 +18,49 @@ const FieldSpace = styled.div<{
   flex-wrap: wrap;
 `;
 
-type CellBoolArr = boolean[][];
+function createCellsState(
+  x: number,
+  y: number,
+  lines: number,
+  columns: number
+) {
+  const result: boolean[][] = [];
+
+  for (let i = 0; i < lines; i++) {
+    result[i] = new Array();
+    for (let j = 0; j < columns; j++) {
+      result[i][j] = false;
+    }
+  }
+  result[x][y] = true;
+
+  return result;
+}
 
 const Field = () => {
   const { fieldSettings } = useFieldSettings();
   const { cellSize, linesCount, columnsCount } = fieldSettings;
-  const [cellsState, setСellsState] = useState<CellBoolArr>([]);
+  const [cellsState, setСellsState] = useState<boolean[][]>([]);
 
   useEffect(() => {
-    setСellsState(createFild(0, 0));
+    setСellsState(createCellsState(0, 0, linesCount, columnsCount));
   }, [linesCount, columnsCount]);
 
   useEffect(() => {
     const onKeydown = (e: KeyboardEvent) => {
-      let coord = { i: 0, j: 0 };
+      let indices = { i: 0, j: 0 };
 
       for (let i = 0; i < cellsState.length; i++) {
         if (cellsState[i].includes(true)) {
           for (let j = 0; j < cellsState[i].length; j++) {
             if (cellsState[i][j]) {
-              coord = { i, j };
+              indices = { i, j };
             }
           }
         }
       }
 
-      let { i, j } = coord;
+      let { i, j } = indices;
 
       switch (e.key) {
         case "ArrowDown":
@@ -67,7 +84,7 @@ const Field = () => {
           }
           break;
       }
-      setСellsState(createFild(i, j));
+      setСellsState(createCellsState(i, j, linesCount, columnsCount));
     };
 
     document.addEventListener("keydown", onKeydown);
@@ -77,30 +94,13 @@ const Field = () => {
     };
   }, [cellsState]);
 
-  function createFild(x: number, y: number) {
-    const fieldArr: CellBoolArr = [];
-
-    for (let i = 0; i < linesCount; i++) {
-      fieldArr[i] = new Array();
-    }
-
-    for (let i = 0; i < linesCount; i++) {
-      for (let j = 0; j < columnsCount; j++) {
-        fieldArr[i][j] = false;
-      }
-    }
-    fieldArr[x][y] = true;
-
-    return fieldArr;
-  }
-
   return (
     <FieldSpace
       $height={cellSize * linesCount}
       $width={cellSize * columnsCount}>
-      {cellsState.map((item) => {
-        return item.map((newItem, i) => {
-          return <Cell key={i} size={cellSize} isFilled={newItem} />;
+      {cellsState.map((row) => {
+        return row.map((isFilled, i) => {
+          return <Cell key={i} size={cellSize} isFilled={isFilled} />;
         });
       })}
     </FieldSpace>
