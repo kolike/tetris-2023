@@ -76,7 +76,8 @@ const Field = () => {
           j++;
           break;
       }
-      if (i >= 0 && i <= linesCount - 1 && j >= 0 && j <= columnsCount - 1) {
+
+      if (i >= 0 && i < linesCount && j >= 0 && j < columnsCount) {
         setСellsState(createCellsState(i, j, linesCount, columnsCount));
       }
     };
