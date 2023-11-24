@@ -37,6 +37,12 @@ function createCellsState(
   return result;
 }
 
+function createNewCellState(oldState: boolean[][], x: number, y: number) {
+  const result: boolean[][] = [...oldState];
+  result[x][y] = true;
+  return result;
+}
+
 const Field = () => {
   const { fieldSettings } = useFieldSettings();
   const { cellSize, linesCount, columnsCount } = fieldSettings;
@@ -79,9 +85,10 @@ const Field = () => {
 
       if (i >= 0 && i < linesCount && j >= 0 && j < columnsCount) {
         setСellsState(createCellsState(i, j, linesCount, columnsCount));
+      } else if (i == linesCount) {
+        setСellsState(createNewCellState(cellsState, 0, 0));
       }
     };
-
     document.addEventListener("keydown", onKeydown);
 
     return () => {
