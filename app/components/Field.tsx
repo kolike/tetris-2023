@@ -21,14 +21,14 @@ const FieldSpace = styled.div<{
 function createCellsState(
   x: number,
   y: number,
-  lines: number,
-  columns: number
+  linesCount: number,
+  columnsCount: number
 ) {
   const result: boolean[][] = [];
 
-  for (let i = 0; i < lines; i++) {
+  for (let i = 0; i < linesCount; i++) {
     result[i] = new Array();
-    for (let j = 0; j < columns; j++) {
+    for (let j = 0; j < columnsCount; j++) {
       result[i][j] = false;
     }
   }
@@ -64,27 +64,21 @@ const Field = () => {
 
       switch (e.key) {
         case "ArrowDown":
-          if (i >= 0 && i < linesCount - 1) {
-            i++;
-          }
+          i++;
           break;
         case "ArrowUp":
-          if (i > 0 && i <= linesCount) {
-            i--;
-          }
+          i--;
           break;
         case "ArrowLeft":
-          if (j > 0 && j <= columnsCount) {
-            j--;
-          }
+          j--;
           break;
         case "ArrowRight":
-          if (j >= 0 && j < columnsCount - 1) {
-            j++;
-          }
+          j++;
           break;
       }
-      setСellsState(createCellsState(i, j, linesCount, columnsCount));
+      if (i >= 0 && i <= linesCount - 1 && j >= 0 && j <= columnsCount - 1) {
+        setСellsState(createCellsState(i, j, linesCount, columnsCount));
+      }
     };
 
     document.addEventListener("keydown", onKeydown);
@@ -92,15 +86,15 @@ const Field = () => {
     return () => {
       document.removeEventListener("keydown", onKeydown);
     };
-  }, [cellsState]);
+  }, [cellsState, linesCount, columnsCount]);
 
   return (
     <FieldSpace
       $height={cellSize * linesCount}
       $width={cellSize * columnsCount}>
-      {cellsState.map((row) => {
-        return row.map((isFilled, i) => {
-          return <Cell key={i} size={cellSize} isFilled={isFilled} />;
+      {cellsState.map((row, i) => {
+        return row.map((isFilled, j) => {
+          return <Cell key={`${i}-${j}`} size={cellSize} isFilled={isFilled} />;
         });
       })}
     </FieldSpace>
