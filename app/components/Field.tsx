@@ -41,9 +41,12 @@ const Field = () => {
   const { fieldSettings } = useFieldSettings();
   const { cellSize, linesCount, columnsCount } = fieldSettings;
   const [cellsState, setСellsState] = useState<boolean[][]>([]);
-  const [activeCellCoords, setActiveCellCoords] = useState({ x: 0, y: 0 });
+  const [activeCellCoords, setActiveCellCoords] = useState({
+    x: 0,
+    y: Math.floor(columnsCount / 2) - 1,
+  });
   const isBottom = useMemo(
-    () => activeCellCoords.x >= linesCount - 1,
+    () => activeCellCoords.x == linesCount - 1,
     [activeCellCoords]
   );
 
@@ -63,36 +66,38 @@ const Field = () => {
       if (!isBottom) {
         switch (e.key) {
           case "ArrowDown":
-            moveBlock(1, 0);
+            if (activeCellCoords.x < linesCount - 1) {
+              moveBlock(1, 0);
+            }
             break;
           case "ArrowUp":
-            moveBlock(-1, 0);
+            if (activeCellCoords.x > 0) {
+              moveBlock(-1, 0);
+            }
             break;
           case "ArrowLeft":
-            moveBlock(0, -1);
+            if (activeCellCoords.y > 0) {
+              moveBlock(0, -1);
+            }
             break;
           case "ArrowRight":
-            moveBlock(0, 1);
+            if (activeCellCoords.y < columnsCount - 1) {
+              moveBlock(0, 1);
+            }
             break;
         }
       }
     };
 
-    if (
-      activeCellCoords.x >= 0 &&
-      activeCellCoords.x < linesCount &&
-      activeCellCoords.y >= 0 &&
-      activeCellCoords.y < columnsCount
-    ) {
-      setСellsState(
-        createCellsState(
-          activeCellCoords.x,
-          activeCellCoords.y,
-          linesCount,
-          columnsCount
-        )
-      );
-    }
+    setСellsState(
+      createCellsState(
+        activeCellCoords.x,
+        activeCellCoords.y,
+        linesCount,
+        columnsCount
+      )
+    );
+
     document.addEventListener("keydown", onKeydown);
 
     return () => {
