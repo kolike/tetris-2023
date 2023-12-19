@@ -1,7 +1,7 @@
 "use client";
 
 import Cell from "./Сell";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import styled from "styled-components";
 import { useFieldSettings } from "../providers/FieldSettingsProvider";
 
@@ -41,8 +41,11 @@ const Field = () => {
   const { fieldSettings } = useFieldSettings();
   const { cellSize, linesCount, columnsCount } = fieldSettings;
   const [cellsState, setСellsState] = useState<boolean[][]>([]);
-  const [cubeAtBottom, setCubeAtBottom] = useState(false);
-  const [cubeCoord, setCubeCoord] = useState({ y: 0, x: 0 });
+  const [activeCellCoords, setActiveCellCoords] = useState({ x: 0, y: 0 });
+  const isBottom = useMemo(
+    () => activeCellCoords.x >= linesCount - 1,
+    [activeCellCoords]
+  );
 
   useEffect(() => {
     setСellsState(
@@ -53,59 +56,58 @@ const Field = () => {
         columnsCount
       )
     );
-  }, [fieldSettings]);
+  }, []);
 
   useEffect(() => {
     const onKeydown = (e: KeyboardEvent) => {
-      if (!cubeAtBottom) {
+      if (!isBottom) {
         switch (e.key) {
           case "ArrowDown":
-            setCubeCoord((prev) => ({
-              ...prev,
-              y: prev.y + 1 > linesCount - 1 ? linesCount - 1 : prev.y + 1,
-            }));
+            moveBlock(1, 0);
             break;
           case "ArrowUp":
-            setCubeCoord((prev) => ({
-              ...prev,
-              y: prev.y - 1 < 0 ? 0 : prev.y - 1,
-            }));
+            moveBlock(-1, 0);
             break;
           case "ArrowLeft":
-            setCubeCoord((prev) => ({
-              ...prev,
-              x: prev.x - 1 < 0 ? 0 : prev.x - 1,
-            }));
+            moveBlock(0, -1);
             break;
           case "ArrowRight":
-            setCubeCoord((prev) => ({
-              ...prev,
-              x: prev.x + 1 > columnsCount - 1 ? columnsCount - 1 : prev.x + 1,
-            }));
+            moveBlock(0, 1);
             break;
         }
       }
     };
 
+    if (
+      activeCellCoords.x >= 0 &&
+      activeCellCoords.x < linesCount &&
+      activeCellCoords.y >= 0 &&
+      activeCellCoords.y < columnsCount
+    ) {
+      setСellsState(
+        createCellsState(
+          activeCellCoords.x,
+          activeCellCoords.y,
+          linesCount,
+          columnsCount
+        )
+      );
+    }
     document.addEventListener("keydown", onKeydown);
+
     return () => {
       document.removeEventListener("keydown", onKeydown);
     };
-  }, [cellsState, linesCount, columnsCount]);
+  }, [linesCount, columnsCount, activeCellCoords]);
 
-  useEffect(() => {
-    if (cubeCoord.y >= 19) {
-      setCubeAtBottom(true);
+  const moveBlock = (i: number, j: number) => {
+    if (!isBottom) {
+      setActiveCellCoords((prev) => ({
+        x: prev.x + i,
+        y: prev.y + j,
+      }));
     }
-  }, [cubeCoord]);
-
-  useEffect(() => {
-    if (!cubeAtBottom) {
-      setСellsState(
-        createCellsState(cubeCoord.y, cubeCoord.x, linesCount, columnsCount)
-      );
-    }
-  }, [cubeCoord]);
+  };
 
   return (
     <FieldSpace
