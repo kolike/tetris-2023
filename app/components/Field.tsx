@@ -25,16 +25,20 @@ function createCellsState(
   columnsCount: number
 ) {
   const result: boolean[][] = [];
-
-  for (let i = 0; i < linesCount; i++) {
-    result[i] = new Array();
-    for (let j = 0; j < columnsCount; j++) {
-      result[i][j] = false;
+  if (linesCount > 0 && columnsCount > 0) {
+    for (let i = 0; i < linesCount; i++) {
+      result[i] = new Array();
+      for (let j = 0; j < columnsCount; j++) {
+        result[i][j] = false;
+      }
     }
-  }
-  result[y][x] = true;
 
-  return result;
+    result[y][x] = true;
+
+    return result;
+  } else {
+    return [];
+  }
 }
 
 const Field = () => {
@@ -43,18 +47,18 @@ const Field = () => {
   const [cellsState, setСellsState] = useState<boolean[][]>([]);
   const [activeCellCoords, setActiveCellCoords] = useState({
     y: 0,
-    x: 0,
+    x: Math.floor(columnsCount / 2) - 1,
   });
 
   const isBottom = useMemo(
-    () => activeCellCoords.y == linesCount - 1,
+    () => activeCellCoords.y === linesCount - 1,
     [activeCellCoords]
   );
 
   useEffect(() => {
     setСellsState(
       createCellsState(
-        Math.floor(columnsCount / 2) - 1,
+        activeCellCoords.x,
         activeCellCoords.y,
         linesCount,
         columnsCount
@@ -65,37 +69,45 @@ const Field = () => {
 
   useEffect(() => {
     const onKeydown = (e: KeyboardEvent) => {
-      let i = activeCellCoords.x;
-      let j = activeCellCoords.y;
-      if (!isBottom) {
+      let newX = activeCellCoords.x;
+      let newY = activeCellCoords.y;
+      if (isBottom) {
+        return;
+      } else {
         switch (e.key) {
           case "ArrowDown":
-            j++;
+            newY++;
             break;
           case "ArrowUp":
-            j--;
+            newY--;
             break;
           case "ArrowLeft":
-            i--;
+            newX--;
             break;
           case "ArrowRight":
-            i++;
+            newX++;
             break;
         }
 
-        if (j >= 0 && j < linesCount && i >= 0 && i < columnsCount) {
-          setСellsState(createCellsState(i, j, linesCount, columnsCount));
-          setActiveCellCoords({ x: i, y: j });
+        if (
+          newY >= 0 &&
+          newY < linesCount &&
+          newX >= 0 &&
+          newX < columnsCount
+        ) {
+          setСellsState(createCellsState(newX, newY, linesCount, columnsCount));
+          setActiveCellCoords({ x: newX, y: newY });
         }
       }
     };
-
+    console.log("cellState: ", cellsState);
+    console.log("activeCoords: ", activeCellCoords);
     document.addEventListener("keydown", onKeydown);
 
     return () => {
       document.removeEventListener("keydown", onKeydown);
     };
-  }, [linesCount, columnsCount, activeCellCoords]);
+  }, [linesCount, columnsCount, activeCellCoords, isBottom]);
 
   return (
     <FieldSpace
