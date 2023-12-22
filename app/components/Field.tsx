@@ -25,20 +25,25 @@ function createCellsState(
   columnsCount: number
 ) {
   const result: boolean[][] = [];
-  if (linesCount > 0 && columnsCount > 0) {
-    for (let i = 0; i < linesCount; i++) {
-      result[i] = new Array();
-      for (let j = 0; j < columnsCount; j++) {
-        result[i][j] = false;
-      }
-    }
-
-    result[y][x] = true;
-
-    return result;
-  } else {
-    return [];
+  if (
+    linesCount <= 0 ||
+    columnsCount <= 0 ||
+    linesCount === undefined ||
+    columnsCount === undefined
+  ) {
+    linesCount = 1;
+    columnsCount = 1;
   }
+  for (let i = 0; i < linesCount; i++) {
+    result[i] = new Array();
+    for (let j = 0; j < columnsCount; j++) {
+      result[i][j] = false;
+    }
+  }
+
+  result[y][x] = true;
+
+  return result;
 }
 
 const Field = () => {
@@ -47,7 +52,7 @@ const Field = () => {
   const [cellsState, setСellsState] = useState<boolean[][]>([]);
   const [activeCellCoords, setActiveCellCoords] = useState({
     y: 0,
-    x: Math.floor(columnsCount / 2) - 1,
+    x: Math.floor(columnsCount / 2),
   });
 
   const isBottom = useMemo(
@@ -58,22 +63,20 @@ const Field = () => {
   useEffect(() => {
     setСellsState(
       createCellsState(
-        activeCellCoords.x,
-        activeCellCoords.y,
+        Math.floor(columnsCount / 2),
+        0,
         linesCount,
         columnsCount
       )
     );
-    setActiveCellCoords({ x: Math.floor(columnsCount / 2) - 1, y: 0 });
+    setActiveCellCoords({ x: Math.floor(columnsCount / 2), y: 0 });
   }, [linesCount, columnsCount]);
 
   useEffect(() => {
     const onKeydown = (e: KeyboardEvent) => {
-      let newX = activeCellCoords.x;
-      let newY = activeCellCoords.y;
-      if (isBottom) {
-        return;
-      } else {
+      if (!isBottom) {
+        let newX = activeCellCoords.x;
+        let newY = activeCellCoords.y;
         switch (e.key) {
           case "ArrowDown":
             newY++;
