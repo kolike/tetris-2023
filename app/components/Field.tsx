@@ -25,15 +25,6 @@ function createCellsState(
   columnsCount: number
 ) {
   const result: boolean[][] = [];
-  if (
-    linesCount <= 0 ||
-    columnsCount <= 0 ||
-    linesCount === undefined ||
-    columnsCount === undefined
-  ) {
-    linesCount = 1;
-    columnsCount = 1;
-  }
   for (let i = 0; i < linesCount; i++) {
     result[i] = new Array();
     for (let j = 0; j < columnsCount; j++) {
@@ -52,7 +43,7 @@ const Field = () => {
   const [cellsState, setСellsState] = useState<boolean[][]>([]);
   const [activeCellCoords, setActiveCellCoords] = useState({
     y: 0,
-    x: Math.floor(columnsCount / 2),
+    x: 0,
   });
 
   const isBottom = useMemo(
@@ -74,33 +65,30 @@ const Field = () => {
 
   useEffect(() => {
     const onKeydown = (e: KeyboardEvent) => {
-      if (!isBottom) {
-        let newX = activeCellCoords.x;
-        let newY = activeCellCoords.y;
-        switch (e.key) {
-          case "ArrowDown":
-            newY++;
-            break;
-          case "ArrowUp":
-            newY--;
-            break;
-          case "ArrowLeft":
-            newX--;
-            break;
-          case "ArrowRight":
-            newX++;
-            break;
-        }
+      if (isBottom) {
+        return;
+      }
 
-        if (
-          newY >= 0 &&
-          newY < linesCount &&
-          newX >= 0 &&
-          newX < columnsCount
-        ) {
-          setСellsState(createCellsState(newX, newY, linesCount, columnsCount));
-          setActiveCellCoords({ x: newX, y: newY });
-        }
+      let newX = activeCellCoords.x;
+      let newY = activeCellCoords.y;
+      switch (e.key) {
+        case "ArrowDown":
+          newY++;
+          break;
+        case "ArrowUp":
+          newY--;
+          break;
+        case "ArrowLeft":
+          newX--;
+          break;
+        case "ArrowRight":
+          newX++;
+          break;
+      }
+
+      if (newY >= 0 && newY < linesCount && newX >= 0 && newX < columnsCount) {
+        setСellsState(createCellsState(newX, newY, linesCount, columnsCount));
+        setActiveCellCoords({ x: newX, y: newY });
       }
     };
     console.log("cellState: ", cellsState);
