@@ -18,28 +18,42 @@ const FieldSettings = () => {
       <label htmlFor="line">Enter number of lines</label>
       <input
         id="line"
-        type="text"
+        type="number"
         placeholder="Number"
         value={fieldSettings.linesCount}
-        onChange={(e) =>
-          setFieldSettings((prev) => ({
-            ...prev,
-            linesCount: +e.target.value,
-          }))
-        }
+        onChange={(e) => {
+          if (+e.target.value <= 0 || +e.target.value > 50) {
+            setFieldSettings((prev) => ({
+              ...prev,
+              linesCount: 1,
+            }));
+          } else {
+            setFieldSettings((prev) => ({
+              ...prev,
+              linesCount: +e.target.value,
+            }));
+          }
+        }}
       />
       <label htmlFor="column">Enter number of columns</label>
       <input
         id="column"
-        type="text"
+        type="number"
         placeholder="Number"
         value={fieldSettings.columnsCount}
-        onChange={(e) =>
-          setFieldSettings((prev) => ({
-            ...prev,
-            columnsCount: +e.target.value,
-          }))
-        }
+        onChange={(e) => {
+          if (+e.target.value <= 0 || +e.target.value > 50) {
+            setFieldSettings((prev) => ({
+              ...prev,
+              columnsCount: 1,
+            }));
+          } else {
+            setFieldSettings((prev) => ({
+              ...prev,
+              columnsCount: +e.target.value,
+            }));
+          }
+        }}
       />
       <label htmlFor="cellSize">Enter cell size</label>
       <input
