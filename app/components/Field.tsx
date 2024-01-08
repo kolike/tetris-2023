@@ -66,6 +66,14 @@ const Field = () => {
   useEffect(() => {
     const onKeydown = (e: KeyboardEvent) => {
       if (isBottom) {
+        // return;
+        setСellsState((prev)=> {
+          const str = JSON.stringify(prev);
+          const arr = JSON.parse(str);
+          arr[0][1] = true;
+          console.log('ARR: ',arr)
+          return arr;
+        })
         return;
       }
 
