@@ -46,6 +46,14 @@ const Field = () => {
     x: 0,
   });
 
+  function fillCellsField() {
+    const arr = [];
+    for (let i = 0; i < columnsCount; i++) {
+      arr[i] = false;
+    }
+    return arr;
+  }
+
   useEffect(() => {
     setСellsState(
       createCellsState(
@@ -68,7 +76,7 @@ const Field = () => {
           setСellsState((prev) => {
             const arr = [...prev];
             arr.splice(i, 1);
-            arr.unshift(new Array(false, false, false, false, false));
+            arr.unshift(fillCellsField());
             arr[0][Math.floor(columnsCount / 2)] = true;
             arr[1][Math.floor(columnsCount / 2)] = false;
             return arr;
@@ -98,20 +106,9 @@ const Field = () => {
           newX++;
           break;
       }
-
-      if (newY == linesCount - 1) {
-        setСellsState((prev) => {
-          const arr = [...prev];
-          arr[activeCellCoords.y][activeCellCoords.x] = false;
-          arr[newY][newX] = true;
-          arr[0][Math.floor(columnsCount / 2)] = true;
-          return arr;
-        });
-        setActiveCellCoords({ x: Math.floor(columnsCount / 2), y: 0 });
+      if (cellsState[newY][newX]) {
         return;
-      } else if (cellsState[newY][newX]) {
-        return;
-      } else if (cellsState[newY + 1][newX]) {
+      } else if (newY == linesCount - 1 || cellsState[newY + 1][newX]) {
         setСellsState((prev) => {
           const arr = [...prev];
           arr[activeCellCoords.y][activeCellCoords.x] = false;
@@ -122,6 +119,7 @@ const Field = () => {
         setActiveCellCoords({ x: Math.floor(columnsCount / 2), y: 0 });
         return;
       }
+
       if (newY >= 0 && newY < linesCount && newX >= 0 && newX < columnsCount) {
         setСellsState((prev) => {
           const arr = [...prev];
