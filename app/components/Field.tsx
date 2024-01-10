@@ -81,18 +81,16 @@ const Field = () => {
     if (gameOver) {
       return;
     }
+    let newX = activeCellCoords.x;
+    let newY = activeCellCoords.y;
     const timerId = setTimeout(() => {
-      let newX = activeCellCoords.x;
-      let newY = activeCellCoords.y + 1;
+      newY = newY + 1;
       moveCube(newX, newY);
     }, 1000);
 
-    if (cellsState.length >= columnsCount) {
-      for (let i = 0; i < linesCount; i++) {
-        if (
-          !cellsState[i].includes(false) &&
-          !cellsState[activeCellCoords.y + 1][i]
-        ) {
+    if (cellsState.length > 2) {
+      for (let i = 0; i < columnsCount; i++) {
+        if (!cellsState[i].includes(false) && !cellsState[newY + 1][i]) {
           setСellsState((prev) => {
             const arr = [...prev];
             arr.splice(i, 1);
@@ -106,6 +104,8 @@ const Field = () => {
         }
       }
     }
+    console.log("activecoords: ", activeCellCoords);
+    console.log("cell: ", cellsState);
 
     return () => {
       clearTimeout(timerId);
