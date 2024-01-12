@@ -78,7 +78,7 @@ const Field = () => {
       moveCube(newX, newY);
     }, 1000);
 
-    if (constCellsState.length > 2) {
+    if (constCellsState.length > 10) {
       for (let i = 0; i < columnsCount; i++) {
         if (
           !constCellsState[i].includes(false) &&
@@ -172,6 +172,7 @@ const Field = () => {
         }
       }
     }
+
     return result;
   }
 
