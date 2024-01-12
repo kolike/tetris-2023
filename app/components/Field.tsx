@@ -8,7 +8,6 @@ import { useFieldSettings } from "../providers/FieldSettingsProvider";
 const FieldSpace = styled.div<{
   $height: number;
   $width: number;
-  $color: string;
 }>`
   display: flex;
   flex-direction: row;
@@ -17,7 +16,6 @@ const FieldSpace = styled.div<{
   height: ${(props) => props.$height}px;
   width: ${(props) => props.$width}px;
   flex-wrap: wrap;
-  background-color: ${(props) => props.$color};
 `;
 
 function createCellsState(
@@ -33,7 +31,9 @@ function createCellsState(
       result[i][j] = false;
     }
   }
-
+  if (x < 0) {
+    return result;
+  }
   result[y][x] = true;
 
   return result;
@@ -43,11 +43,11 @@ const Field = () => {
   const { fieldSettings } = useFieldSettings();
   const { cellSize, linesCount, columnsCount } = fieldSettings;
   const [cellsState, setСellsState] = useState<boolean[][]>([]);
+  const [constCellsState, setConstСellsState] = useState<boolean[][]>([]);
   const [activeCellCoords, setActiveCellCoords] = useState({
     y: 0,
     x: 0,
   });
-  const [gameOver, setGameOver] = useState(false);
 
   function fillCellsField() {
     const arr = [];
@@ -66,21 +66,11 @@ const Field = () => {
         columnsCount
       )
     );
+    setConstСellsState(createCellsState(-1, 0, linesCount, columnsCount));
     setActiveCellCoords({ x: Math.floor(columnsCount / 2), y: 0 });
   }, [linesCount, columnsCount]);
 
   useEffect(() => {
-    if (cellsState.length >= columnsCount) {
-      if (cellsState[activeCellCoords.y + 1][activeCellCoords.x]) {
-        setGameOver((prev) => !prev);
-      }
-    }
-  }, [cellsState]);
-
-  useEffect(() => {
-    if (gameOver) {
-      return;
-    }
     let newX = activeCellCoords.x;
     let newY = activeCellCoords.y;
     const timerId = setTimeout(() => {
@@ -88,15 +78,16 @@ const Field = () => {
       moveCube(newX, newY);
     }, 1000);
 
-    if (cellsState.length > 2) {
+    if (constCellsState.length > 2) {
       for (let i = 0; i < columnsCount; i++) {
-        if (!cellsState[i].includes(false) && !cellsState[newY + 1][i]) {
-          setСellsState((prev) => {
+        if (
+          !constCellsState[i].includes(false) &&
+          !constCellsState[newY + 1][i]
+        ) {
+          setConstСellsState((prev) => {
             const arr = [...prev];
             arr.splice(i, 1);
             arr.unshift(fillCellsField());
-            arr[0][Math.floor(columnsCount / 2)] = true;
-            arr[1][Math.floor(columnsCount / 2)] = false;
             return arr;
           });
           setActiveCellCoords({ x: Math.floor(columnsCount / 2), y: 0 });
@@ -104,8 +95,6 @@ const Field = () => {
         }
       }
     }
-    console.log("activecoords: ", activeCellCoords);
-    console.log("cell: ", cellsState);
 
     return () => {
       clearTimeout(timerId);
@@ -113,17 +102,21 @@ const Field = () => {
   }, [cellsState]);
 
   function moveCube(newX: number, newY: number) {
-    if (gameOver) {
+    if (constCellsState[newY][newX]) {
       return;
     }
-    if (cellsState[newY][newX]) {
-      return;
-    } else if (newY == linesCount - 1 || cellsState[newY + 1][newX]) {
-      setСellsState((prev) => {
+    if (newY == linesCount - 1 || constCellsState[newY + 1][newX]) {
+      setСellsState(
+        createCellsState(
+          Math.floor(columnsCount / 2),
+          0,
+          linesCount,
+          columnsCount
+        )
+      );
+      setConstСellsState((prev) => {
         const arr = [...prev];
-        arr[activeCellCoords.y][activeCellCoords.x] = false;
         arr[newY][newX] = true;
-        arr[0][Math.floor(columnsCount / 2)] = true;
         return arr;
       });
       setActiveCellCoords({ x: Math.floor(columnsCount / 2), y: 0 });
@@ -142,9 +135,6 @@ const Field = () => {
   }
 
   function onKeydown(e: KeyboardEvent) {
-    if (gameOver) {
-      return;
-    }
     let newX = activeCellCoords.x;
     let newY = activeCellCoords.y;
     switch (e.key) {
@@ -163,31 +153,38 @@ const Field = () => {
 
   useEffect(() => {
     document.addEventListener("keydown", onKeydown);
+    console.log("activecoords: ", activeCellCoords);
+    console.log("cell: ", cellsState);
+    console.log("ConstCell: ", constCellsState);
 
     return () => {
       document.removeEventListener("keydown", onKeydown);
     };
   }, [linesCount, columnsCount, activeCellCoords]);
 
+  function logicallyMultiplyCells(arr1: boolean[][], arr2: boolean[][]) {
+    let result: boolean[][] = [[]];
+    if (arr1.length > 2 && arr2.length > 2) {
+      for (let i = 0; i < linesCount; i++) {
+        result[i] = new Array();
+        for (let j = 0; j < columnsCount; j++) {
+          result[i][j] = arr1[i][j] || arr2[i][j];
+        }
+      }
+    }
+    return result;
+  }
+
   return (
-    <>
-      <FieldSpace
-        $height={cellSize * linesCount}
-        $width={cellSize * columnsCount}
-        $color={gameOver ? "red" : ""}>
-        {!gameOver ? (
-          cellsState.map((row, i) => {
-            return row.map((isFilled, j) => {
-              return (
-                <Cell key={`${i}-${j}`} size={cellSize} isFilled={isFilled} />
-              );
-            });
-          })
-        ) : (
-          <div>Game Over!</div>
-        )}
-      </FieldSpace>
-    </>
+    <FieldSpace
+      $height={cellSize * linesCount}
+      $width={cellSize * columnsCount}>
+      {logicallyMultiplyCells(cellsState, constCellsState).map((row, i) => {
+        return row.map((isFilled, j) => {
+          return <Cell key={`${i}-${j}`} size={cellSize} isFilled={isFilled} />;
+        });
+      })}
+    </FieldSpace>
   );
 };
 
