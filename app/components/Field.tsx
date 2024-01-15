@@ -78,7 +78,7 @@ const Field = () => {
       moveCube(newX, newY);
     }, 1000);
 
-    if (constCellsState.length > 10) {
+    if (constCellsState.length >= linesCount) {
       for (let i = 0; i < columnsCount; i++) {
         if (
           !constCellsState[i].includes(false) &&
@@ -90,7 +90,7 @@ const Field = () => {
             arr.unshift(fillCellsField());
             return arr;
           });
-          setActiveCellCoords({ x: Math.floor(columnsCount / 2), y: 0 });
+          // setActiveCellCoords({ x: Math.floor(columnsCount / 2), y: 0 });
           return;
         }
       }
@@ -131,6 +131,7 @@ const Field = () => {
         return arr;
       });
       setActiveCellCoords({ x: newX, y: newY });
+      return;
     }
   }
 
