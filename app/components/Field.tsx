@@ -19,10 +19,10 @@ const FieldSpace = styled.div<{
 `;
 
 function createCellsState(
-  x: number,
-  y: number,
   linesCount: number,
-  columnsCount: number
+  columnsCount: number,
+  x?: number,
+  y?: number,
 ) {
   const result: boolean[][] = [];
   for (let i = 0; i < linesCount; i++) {
@@ -31,110 +31,62 @@ function createCellsState(
       result[i][j] = false;
     }
   }
-  if (x < 0) {
-    return result;
-  }
-  result[y][x] = true;
 
+  if (x !== undefined && y !== undefined) {
+    result[y][x] = true;
+  }
+ 
   return result;
 }
+
+    function createEmptyLine(lineSize:number) {
+      const arr = [];
+        for (let i = 0; i < lineSize; i++) {
+          arr[i] = false;
+        }
+      return arr;
+  }
+
+  function mergeCellsStates(a: boolean[][], b: boolean[][], linesCount:number, columnsCount:number) {
+    let result: boolean[][] = [[]];
+    if (a.length === linesCount  && b.length === linesCount) {
+      for (let i = 0; i < linesCount; i++) {
+        result[i] = new Array();
+        for (let j = 0; j < columnsCount; j++) {
+          result[i][j] = a[i][j] || b[i][j];
+        }
+      }
+    }
+
+    return result;
+  }
 
 const Field = () => {
   const { fieldSettings } = useFieldSettings();
   const { cellSize, linesCount, columnsCount } = fieldSettings;
+  const [activeCellsState, setActiveCellsState] = useState<boolean[][]>([]);
   const [cellsState, setСellsState] = useState<boolean[][]>([]);
-  const [constCellsState, setConstСellsState] = useState<boolean[][]>([]);
   const [activeCellCoords, setActiveCellCoords] = useState({
     y: 0,
     x: 0,
   });
 
-  function fillCellsField() {
-    const arr = [];
-    for (let i = 0; i < columnsCount; i++) {
-      arr[i] = false;
-    }
-    return arr;
-  }
-
+  // Инициаизация начального состояния
   useEffect(() => {
-    setСellsState(
+    setActiveCellsState(
       createCellsState(
+        linesCount,
+        columnsCount,
         Math.floor(columnsCount / 2),
         0,
-        linesCount,
-        columnsCount
       )
     );
-    setConstСellsState(createCellsState(-1, 0, linesCount, columnsCount));
+    setСellsState(createCellsState(linesCount, columnsCount));
     setActiveCellCoords({ x: Math.floor(columnsCount / 2), y: 0 });
   }, [linesCount, columnsCount]);
 
-  useEffect(() => {
-    let newX = activeCellCoords.x;
-    let newY = activeCellCoords.y;
-    const timerId = setTimeout(() => {
-      newY = newY + 1;
-      moveCube(newX, newY);
-    }, 1000);
-
-    if (constCellsState.length >= linesCount) {
-      for (let i = 0; i < columnsCount; i++) {
-        if (
-          !constCellsState[i].includes(false) &&
-          !constCellsState[newY + 1][i]
-        ) {
-          setConstСellsState((prev) => {
-            const arr = [...prev];
-            arr.splice(i, 1);
-            arr.unshift(fillCellsField());
-            return arr;
-          });
-          // setActiveCellCoords({ x: Math.floor(columnsCount / 2), y: 0 });
-          return;
-        }
-      }
-    }
-
-    return () => {
-      clearTimeout(timerId);
-    };
-  }, [cellsState]);
-
-  function moveCube(newX: number, newY: number) {
-    if (constCellsState[newY][newX]) {
-      return;
-    }
-    if (newY == linesCount - 1 || constCellsState[newY + 1][newX]) {
-      setСellsState(
-        createCellsState(
-          Math.floor(columnsCount / 2),
-          0,
-          linesCount,
-          columnsCount
-        )
-      );
-      setConstСellsState((prev) => {
-        const arr = [...prev];
-        arr[newY][newX] = true;
-        return arr;
-      });
-      setActiveCellCoords({ x: Math.floor(columnsCount / 2), y: 0 });
-      return;
-    }
-
-    if (newY >= 0 && newY < linesCount && newX >= 0 && newX < columnsCount) {
-      setСellsState((prev) => {
-        const arr = [...prev];
-        arr[activeCellCoords.y][activeCellCoords.x] = false;
-        arr[newY][newX] = true;
-        return arr;
-      });
-      setActiveCellCoords({ x: newX, y: newY });
-      return;
-    }
-  }
-
+  // Обработка пользовательского ввода
+useEffect(() => {
   function onKeydown(e: KeyboardEvent) {
     let newX = activeCellCoords.x;
     let newY = activeCellCoords.y;
@@ -148,40 +100,81 @@ const Field = () => {
       case "ArrowRight":
         newX++;
         break;
+        default: return;
     }
-    moveCube(newX, newY);
+
+    if (cellsState[newY][newX]) {
+      return;
+    }
+    
+    if (newY == linesCount - 1 || cellsState[newY + 1][newX]) {
+      setActiveCellsState(
+        createCellsState(
+          linesCount,
+          columnsCount,
+          Math.floor(columnsCount / 2),
+          0,
+        )
+      );
+      setСellsState((prev) => {
+        const arr = [...prev];
+        arr[newY][newX] = true;
+        return arr;
+      });
+      setActiveCellCoords({ x: Math.floor(columnsCount / 2), y: 0 });
+      return;
+    }
+
+    if (newY >= 0 && newY < linesCount && newX >= 0 && newX < columnsCount) {
+      setActiveCellsState((prev) => {
+        const arr = [...prev];
+        arr[activeCellCoords.y][activeCellCoords.x] = false;
+        arr[newY][newX] = true;
+        return arr;
+      });
+      setActiveCellCoords({ x: newX, y: newY });
+      return;
+    }
   }
 
-  useEffect(() => {
-    document.addEventListener("keydown", onKeydown);
-    console.log("activecoords: ", activeCellCoords);
-    console.log("cell: ", cellsState);
-    console.log("ConstCell: ", constCellsState);
+  document.addEventListener("keydown", onKeydown);
 
     return () => {
       document.removeEventListener("keydown", onKeydown);
     };
-  }, [linesCount, columnsCount, activeCellCoords]);
+  }, [activeCellsState, cellsState, activeCellCoords, linesCount, columnsCount ]);
 
-  function logicallyMultiplyCells(arr1: boolean[][], arr2: boolean[][]) {
-    let result: boolean[][] = [[]];
-    if (arr1.length > 2 && arr2.length > 2) {
+  // Удаление заполненной строки
+  useEffect(() => {
+    let newY = activeCellCoords.y;
+
+    if (cellsState.length >= linesCount) {
       for (let i = 0; i < linesCount; i++) {
-        result[i] = new Array();
-        for (let j = 0; j < columnsCount; j++) {
-          result[i][j] = arr1[i][j] || arr2[i][j];
+        if (
+          !cellsState[i].includes(false) &&
+          !cellsState[newY + 1][i]
+        ) {
+          setСellsState((prev) => {
+            const arr = [...prev];
+            arr.splice(i, 1);
+            arr.unshift(createEmptyLine(columnsCount));
+            return arr;
+          });
+          return;
         }
       }
     }
+  }, [cellsState]);
 
-    return result;
-  }
+    console.log("activeCellCoords: ", activeCellCoords);
+    console.log("activeCellsState: ", activeCellsState);
+    console.log("cellsState: ", cellsState);
 
   return (
     <FieldSpace
       $height={cellSize * linesCount}
       $width={cellSize * columnsCount}>
-      {logicallyMultiplyCells(cellsState, constCellsState).map((row, i) => {
+      {mergeCellsStates(activeCellsState, cellsState, linesCount, columnsCount).map((row, i) => {
         return row.map((isFilled, j) => {
           return <Cell key={`${i}-${j}`} size={cellSize} isFilled={isFilled} />;
         });
