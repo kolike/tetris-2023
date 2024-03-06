@@ -140,7 +140,11 @@ const Field = () => {
             return;
           }
 
-          if (newY == linesCount - 2 || cellsState[newY + 2][newX]) {
+          if (
+            newY == linesCount - 2 ||
+            cellsState[newY + 2][newX] ||
+            cellsState[newY + 2][newX + 1]
+          ) {
             setActiveCellsState(
               createCellsState(linesCount, columnsCount, randomIndexTetramino)
             );
